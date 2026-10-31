@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Guia de segurança da informação para pequenas empresas: Active Directory, Linux, rede, Wi-Fi, acesso remoto e soluções. Desenvolvido por Murilo Rozado.">
+<meta name="author" content="Murilo Rozado">
+<title>Segurança da Informação para PMEs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: guia de página única em tema galáxia. Topo fixo translúcido, hero com prompt de terminal
+   e mapa de prioridades, seções em painéis de vidro, tabela de soluções, roteiro de 90 dias e autoavaliação. */
+:root {
+  --bg: #030614;
+  --surface: rgba(12, 28, 72, 0.55);
+  --surface-2: rgba(60, 130, 255, 0.16);
+  --glass: rgba(6, 14, 42, 0.66);
+  --fg: #BCD6FF;
+  --head: #6FBBFF;
+  --muted: #8AA6CE;
+  --line: rgba(100, 160, 255, 0.28);
+  --accent: #4DA8FF;
+  --accent-fg: #021026;
+  --code-bg: rgba(2, 5, 16, 0.88);
+  --code-fg: #9FD8FF;
+  --code-mute: #5F83B5;
+  --crit-bg: rgba(255, 90, 80, 0.16); --crit-fg: #FF9C92;
+  --warn-bg: rgba(255, 190, 60, 0.16); --warn-fg: #FFD27A;
+  --ok-bg: rgba(60, 220, 140, 0.16);  --ok-fg: #8FEDB8;
+  --font-display: "Chakra Petch", "Segoe UI", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 30; background: var(--bg);
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+.wrap {
+  max-width: 1080px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Topo */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; gap: 20px; min-height: 52px; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; white-space: nowrap; color: var(--fg); text-decoration: none; }
+.brand b { color: var(--accent); font-weight: 700; }
+.nav { display: flex; gap: 4px; overflow-x: auto; min-width: 0; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a {
+  white-space: nowrap; text-decoration: none; color: var(--muted);
+  font-size: 14px; font-weight: 500; padding: 6px 10px; border-radius: 4px;
+}
+.nav a:hover { color: var(--fg); background: var(--surface-2); }
+
+/* Tipografia */
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.9rem); font-weight: 700; }
+h2 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);
+}
+.lead { font-size: 1.125rem; color: var(--muted); max-width: 62ch; }
+code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+p code, li code, td code {
+  background: var(--surface-2); padding: 1px 6px; border-radius: 3px;
+}
+
+/* Hero */
+.hero { padding-block: 56px 48px; border-bottom: 1px solid var(--line); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.hero-copy { display: flex; flex-direction: column; gap: 22px; }
+.hero-copy .note { font-size: 0.95rem; color: var(--muted); max-width: 58ch; border-top: 1px solid var(--line); padding-top: 16px; }
+
+.map { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.map-h { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.map-h .eyebrow { color: var(--muted); }
+.map a.row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: center;
+  padding: 14px 16px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--fg);
+}
+.map a.row:last-of-type { border-bottom: 0; }
+.map a.row:hover { background: var(--surface-2); }
+.row .t { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+.row .s { grid-column: 1; font-size: 0.875rem; color: var(--muted); }
+.chip {
+  grid-column: 2; grid-row: 1 / span 2;
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 4px 9px; border-radius: 3px; white-space: nowrap;
+}
+.chip.crit { background: var(--crit-bg); color: var(--crit-fg); }
+.chip.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.chip.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.map-f { padding: 12px 16px; font-size: 0.8125rem; color: var(--muted); border-top: 1px solid var(--line); }
+
+/* Seções */
+.area { padding-block: 72px; border-bottom: 1px solid var(--line); scroll-margin-top: 56px; }
+.area-head { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+.area.alt { background: var(--surface); }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.panel { border: 1px solid var(--line); border-radius: 6px; padding: 22px; background: var(--bg); display: flex; flex-direction: column; gap: 14px; }
+.alt .panel { background: var(--bg); }
+.panel ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 10px; }
+.panel li::marker { color: var(--accent); }
+.panel.risk h3::before, .panel.do h3::before {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.08em; display: block; margin-bottom: 8px;
+}
+.panel.risk h3::before { content: "Onde falha"; color: var(--crit-fg); }
+.panel.do h3::before { content: "Como corrigir"; color: var(--ok-fg); }
+
+.code { margin-top: 24px; border-radius: 6px; overflow: hidden; background: var(--code-bg); color: var(--code-fg); }
+.code-h { font-family: var(--font-mono); font-size: 12px; color: var(--code-mute); padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); text-transform: uppercase; letter-spacing: 0.08em; }
+.code pre { margin: 0; padding: 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7; }
+.code .c { color: var(--code-mute); }
+
+.sol {
+  margin-top: 24px; background: var(--surface-2); padding: 20px 22px; border-radius: 6px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 20px; align-items: baseline;
+}
+.sol .eyebrow { color: var(--fg); }
+.sol p { max-width: 75ch; }
+
+/* Mapa de rede */
+.netmap { margin-top: 24px; border: 1px solid var(--line); border-radius: 6px; padding: 22px; background: var(--bg); display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+.netmap .node { text-align: center; padding: 12px 16px; border-radius: 4px; font-weight: 600; font-family: var(--font-display); }
+.node.inet { background: var(--surface-2); }
+.node.fw { background: var(--accent); color: var(--accent-fg); }
+.node.fw small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 13px; opacity: 0.92; margin-top: 2px; }
+.netmap .link { width: 2px; height: 22px; background: var(--line); align-self: center; }
+.vlans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.vlan { border: 1px solid var(--line); border-radius: 4px; padding: 14px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; }
+.vlan b { font-family: var(--font-display); font-size: 1rem; }
+.vlan .id { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.vlan p { font-size: 0.875rem; color: var(--muted); }
+.vlan.guest { border-style: dashed; }
+
+/* Tabelas */
+.tablebox { margin-top: 24px; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.95rem; }
+th, td { text-align: left; padding: 12px 16px; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+
+/* Fluxo de acesso remoto */
+.flow { margin-top: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.step { border: 1px solid var(--line); border-radius: 4px; padding: 14px; background: var(--bg); position: relative; }
+.step b { display: block; font-family: var(--font-display); }
+.step span { font-size: 0.875rem; color: var(--muted); }
+.step + .step::before { content: "→"; position: absolute; left: -12px; top: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 700; }
+
+/* Roteiro */
+.phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.phase { border-top: 3px solid var(--accent); padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.phase .eyebrow { color: var(--muted); }
+.phase ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+.phase li::marker { color: var(--accent); }
+
+/* Autoavaliação */
+.check-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.groups { display: flex; flex-direction: column; gap: 22px; }
+.group h3 { font-size: 0.9rem; font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+.group label {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start;
+  padding: 11px 0; border-top: 1px solid var(--line); cursor: pointer; font-size: 0.95rem;
+}
+.group input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); }
+.score { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 68px); border: 1px solid var(--line); border-radius: 6px; padding: 22px; background: var(--bg); display: flex; flex-direction: column; gap: 14px; }
+.score .big { font-family: var(--font-display); font-weight: 700; font-size: 3.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.score .big small { font-size: 1.2rem; color: var(--muted); font-weight: 500; }
+.bar { height: 10px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.25s ease; }
+.level { align-self: flex-start; }
+.bd { display: flex; flex-direction: column; font-size: 0.9rem; }
+.bd div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.bd span:last-child { font-family: var(--font-mono); }
+.hint { font-size: 0.875rem; color: var(--muted); }
+
+footer { padding-block: 40px 56px; color: var(--muted); font-size: 0.9rem; }
+footer .wrap { display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 900px) {
+  .hero-grid, .check-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .vlans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step + .step::before { display: none; }
+  .phases { grid-template-columns: minmax(0, 1fr); }
+  .score { position: static; }
+}
+@media (max-width: 640px) {
+  .hero { padding-block: 36px 36px; }
+  .area { padding-block: 48px; }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .vlans, .flow { grid-template-columns: minmax(0, 1fr); }
+  .sol { grid-template-columns: minmax(0, 1fr); }
+  .brand { font-size: 15px; }
+  .top .wrap { gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .bar i { transition: none; }
+}
+
+/* Tema hacker e galáxia */
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(60% 50% at 16% 10%, rgba(40, 110, 255, 0.24), transparent 70%),
+    radial-gradient(50% 45% at 88% 18%, rgba(120, 70, 255, 0.17), transparent 70%),
+    radial-gradient(70% 55% at 72% 96%, rgba(0, 170, 255, 0.15), transparent 70%),
+    linear-gradient(118deg, transparent 32%, rgba(90, 140, 255, 0.07) 44%, rgba(160, 120, 255, 0.08) 52%, transparent 66%);
+  background-attachment: fixed;
+}
+#stars { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+main, footer { position: relative; z-index: 1; }
+.top { background: rgba(3, 7, 20, 0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.brand { color: var(--head); font-family: var(--font-mono); font-weight: 500; font-size: 15px; }
+.brand::before { content: "> "; color: var(--accent); }
+.brand b { color: var(--fg); font-weight: 500; }
+.nav a { font-family: var(--font-mono); font-size: 13px; }
+.nav a:hover { color: var(--head); }
+
+h1, h2 { color: var(--head); text-shadow: 0 0 26px rgba(61, 155, 255, 0.5); }
+h3 { color: var(--head); }
+h2::before { content: "> "; color: var(--accent); font-family: var(--font-mono); font-weight: 500; }
+.eyebrow { text-shadow: 0 0 12px rgba(61, 155, 255, 0.5); }
+.lead { color: var(--fg); opacity: 0.9; }
+a { color: var(--head); }
+
+.prompt { font-family: var(--font-mono); font-size: 14px; color: var(--fg); margin: 0; }
+.prompt .u { color: var(--accent); }
+.prompt .p { color: #7FE3FF; }
+.prompt .s { color: var(--muted); }
+.cur { display: inline-block; width: 0.6em; height: 1.1em; background: var(--accent); vertical-align: -3px; margin-left: 6px; animation: blink 1.1s steps(1) infinite; box-shadow: 0 0 10px var(--accent); }
+@keyframes blink { 50% { opacity: 0; } }
+
+.map, .panel, .netmap, .tablebox, .step, .score, .vlan {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.alt .panel { background: var(--glass); }
+.area.alt { background: rgba(4, 10, 32, 0.42); }
+.map, .panel, .netmap, .tablebox, .score { box-shadow: 0 0 0 1px rgba(77, 168, 255, 0.04), 0 8px 30px rgba(0, 10, 40, 0.45); }
+.map a.row:hover { background: var(--surface-2); }
+.code { border: 1px solid var(--line); box-shadow: 0 0 24px rgba(40, 110, 255, 0.12); }
+.code-h { border-bottom-color: var(--line); }
+.bar i { box-shadow: 0 0 12px var(--accent); }
+.node.fw { box-shadow: 0 0 22px rgba(77, 168, 255, 0.45); }
+.phase { border-top-color: var(--accent); box-shadow: 0 -8px 16px -12px var(--accent); }
+td:first-child { color: var(--head); }
+hr { border-color: var(--line); }
+@media (prefers-reduced-motion: reduce) { .cur { animation: none; } }
+</style>
+</head>
+<body>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio">Segurança <b>PME</b></a>
+    <nav class="nav" aria-label="Seções">
+      <a href="#active-directory">Active Directory</a>
+      <a href="#linux">Linux</a>
+      <a href="#rede">Rede</a>
+      <a href="#wifi">Wi-Fi</a>
+      <a href="#acesso-remoto">Acesso remoto</a>
+      <a href="#solucoes">Soluções</a>
+      <a href="#autoavaliacao">Autoavaliação</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="prompt" aria-label="Guia para pequenas e médias empresas"><span class="u">root@pme</span><span class="s">:</span><span class="p">~</span><span class="s">$</span> ./guia --seguranca --pme<i class="cur" aria-hidden="true"></i></p>
+        <h1>Segurança da informação para pequenas empresas</h1>
+        <p class="lead">Cinco pontos onde empresas pequenas costumam ser invadidas: Active Directory, servidores Linux, rede corporativa, Wi-Fi e acesso remoto dos funcionários. Em cada um você encontra o que verificar e o que implantar, com ferramentas que cabem em um orçamento enxuto.</p>
+        <p class="note">A LGPD (Lei 13.709/2018) exige medidas de segurança para proteger dados pessoais, qualquer que seja o tamanho da empresa. Um vazamento de cadastro de clientes ou de folha de pagamento já cria essa obrigação.</p>
+        <p class="note">Desenvolvido por <strong>Murilo Rozado</strong>, analista e desenvolvedor de sistemas com ênfase em segurança da informação.</p>
+      </div>
+
+      <aside class="map" aria-label="Onde olhar primeiro">
+        <div class="map-h"><span class="eyebrow">Onde olhar primeiro</span><span class="eyebrow">Atenção típica</span></div>
+        <a class="row" href="#acesso-remoto"><span class="t">Acesso remoto</span><span class="s">RDP exposto, sem MFA, notebooks sem criptografia</span><span class="chip crit">Crítica</span></a>
+        <a class="row" href="#active-directory"><span class="t">Active Directory</span><span class="s">Admins demais, senhas que não expiram</span><span class="chip crit">Alta</span></a>
+        <a class="row" href="#rede"><span class="t">Rede corporativa</span><span class="s">Rede plana, sem segmentação nem firewall gerenciado</span><span class="chip crit">Alta</span></a>
+        <a class="row" href="#wifi"><span class="t">Wi-Fi</span><span class="s">Senha única para todos, visitantes na mesma rede</span><span class="chip warn">Média-alta</span></a>
+        <a class="row" href="#linux"><span class="t">Servidores Linux</span><span class="s">SSH com senha, pacotes desatualizados</span><span class="chip warn">Média</span></a>
+        <div class="map-f">Classificação qualitativa baseada em falhas frequentes. Sua empresa pode ter outra ordem; use a autoavaliação no fim da página.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ACTIVE DIRECTORY -->
+  <section class="area" id="active-directory">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Camada de identidade</p>
+        <h2>Active Directory</h2>
+        <p class="lead">O Active Directory (AD) decide quem é quem na rede Windows: usuários, grupos, computadores e permissões. Quem controla o AD controla a empresa, por isso ele é o alvo preferido em ataques de ransomware.</p>
+      </div>
+      <div class="cols">
+        <div class="panel risk">
+          <h3>Erros comuns em PMEs</h3>
+          <ul>
+            <li>Vários funcionários e o prestador de TI no grupo <code>Domain Admins</code>.</li>
+            <li>Administrador usado no dia a dia, inclusive para ler e-mail e navegar.</li>
+            <li>Contas de ex-funcionários ativas e senhas configuradas para nunca expirar.</li>
+            <li>Mesma senha de administrador local em todas as estações.</li>
+            <li>Controlador de domínio sem atualizações e sem backup do estado do sistema.</li>
+            <li>Protocolos antigos habilitados, como SMBv1 e NTLMv1.</li>
+          </ul>
+        </div>
+        <div class="panel do">
+          <h3>O que implantar</h3>
+          <ul>
+            <li>Reduzir <code>Domain Admins</code> ao mínimo e criar uma conta administrativa separada da conta comum de cada técnico.</li>
+            <li>Política de senhas com mínimo de 12 caracteres e bloqueio após tentativas falhas, via GPO.</li>
+            <li>Windows LAPS para gerar senhas únicas de administrador local em cada computador.</li>
+            <li>MFA para administradores e para qualquer acesso externo ao ambiente.</li>
+            <li>Rotina mensal para desativar contas inativas e revisar grupos privilegiados.</li>
+            <li>Desabilitar SMBv1, exigir assinatura de LDAP e ativar auditoria de logon e de alteração de grupos.</li>
+            <li>Backup diário do controlador de domínio, com teste de restauração.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code">
+        <div class="code-h">PowerShell · auditoria rápida do domínio</div>
+<pre><code><span class="c"># Quem é administrador do domínio?</span>
+Get-ADGroupMember "Domain Admins" | Select-Object Name, SamAccountName
+
+<span class="c"># Contas ativas sem login há mais de 90 dias</span>
+Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly |
+  Where-Object Enabled | Select-Object Name, LastLogonDate
+
+<span class="c"># Contas cuja senha nunca expira</span>
+Get-ADUser -Filter 'PasswordNeverExpires -eq $true' | Select-Object Name</code></pre>
+      </div>
+      <div class="sol">
+        <span class="eyebrow">Para PME</span>
+        <p>Se a empresa tem menos de 15 computadores e usa quase só aplicações em nuvem, avalie trocar o AD local por Microsoft Entra ID ou Google Workspace. Você elimina o servidor físico e passa a usar MFA e acesso condicional nativos. Se o AD for necessário, mantenha dois controladores de domínio e aplique as ações acima.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINUX -->
+  <section class="area alt" id="linux">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Camada de servidores</p>
+        <h2>Linux</h2>
+        <p class="lead">Servidores Linux costumam hospedar sites, bancos de dados, arquivos e sistemas internos. São estáveis, mas só permanecem seguros com atualização, acesso restrito e monitoramento.</p>
+      </div>
+      <div class="cols">
+        <div class="panel risk">
+          <h3>Erros comuns em PMEs</h3>
+          <ul>
+            <li>Login por senha no SSH (porta 22) aberto para a internet.</li>
+            <li>Uso direto do usuário <code>root</code> e senha compartilhada entre técnicos.</li>
+            <li>Pacotes sem atualização por meses, inclusive o kernel.</li>
+            <li>Serviços desnecessários ativos e portas de banco de dados expostas.</li>
+            <li>Sem registro de quem fez o quê e sem backup fora do servidor.</li>
+          </ul>
+        </div>
+        <div class="panel do">
+          <h3>O que implantar</h3>
+          <ul>
+            <li>Autenticação por chave SSH, <code>root</code> desativado e acesso liberado só para usuários nomeados.</li>
+            <li>Firewall local (<code>ufw</code> ou <code>nftables</code>) com política de negar por padrão.</li>
+            <li>Atualizações de segurança automáticas e janela mensal para reiniciar.</li>
+            <li><code>fail2ban</code> para bloquear tentativas repetidas e <code>auditd</code> para trilha de auditoria.</li>
+            <li><code>sudo</code> com privilégio mínimo e SELinux ou AppArmor ativos.</li>
+            <li>Remover o que não é usado e manter o banco de dados escutando só em rede interna.</li>
+            <li>Backup criptografado em outro local, com restauração testada.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code">
+        <div class="code-h">Debian / Ubuntu · endurecimento básico</div>
+<pre><code><span class="c"># /etc/ssh/sshd_config</span>
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries 3
+AllowUsers suporte deploy
+
+<span class="c"># mantenha uma segunda sessão aberta ao testar</span>
+sudo sshd -t &amp;&amp; sudo systemctl reload ssh
+
+<span class="c"># firewall: SSH só a partir da rede de TI</span>
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow from 192.168.10.0/24 to any port 22 proto tcp
+sudo ufw enable
+
+<span class="c"># atualizações automáticas, bloqueio de força bruta e auditoria</span>
+sudo apt install unattended-upgrades fail2ban auditd
+sudo dpkg-reconfigure -plow unattended-upgrades</code></pre>
+      </div>
+      <div class="sol">
+        <span class="eyebrow">Para PME</span>
+        <p>Padronize em uma distribuição com suporte de longo prazo, como Ubuntu LTS ou Debian estável. Centralize os logs com Wazuh ou Graylog e use um gerenciador de configuração simples, como Ansible, para que todos os servidores sigam o mesmo padrão seguro.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REDE -->
+  <section class="area" id="rede">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Camada de rede</p>
+        <h2>Segurança da rede corporativa</h2>
+        <p class="lead">Em uma rede plana, um único computador infectado alcança impressoras, câmeras, servidores e backups. A defesa começa por separar a rede em zonas e controlar o tráfego entre elas.</p>
+      </div>
+      <div class="cols">
+        <div class="panel risk">
+          <h3>Erros comuns em PMEs</h3>
+          <ul>
+            <li>Roteador de operadora como único firewall, com senha padrão no painel.</li>
+            <li>Todos os dispositivos na mesma faixa de IP, sem separação por função.</li>
+            <li>Portas como <code>3389</code> (RDP), <code>445</code> (SMB) e <code>22</code> (SSH) redirecionadas para a internet.</li>
+            <li>Switches e câmeras com firmware antigo e credenciais de fábrica.</li>
+            <li>Ninguém olha os logs e não há alerta de tráfego estranho.</li>
+          </ul>
+        </div>
+        <div class="panel do">
+          <h3>O que implantar</h3>
+          <ul>
+            <li>Firewall gerenciado (UTM) com filtro de DNS, IPS e relatórios.</li>
+            <li>VLANs separando usuários, servidores, convidados e dispositivos IoT, com regras explícitas entre elas.</li>
+            <li>Fechar portas expostas e publicar serviços só por VPN ou proxy reverso.</li>
+            <li>Gerenciar switches e APs por uma VLAN própria de administração.</li>
+            <li>Atualizar firmware a cada trimestre e trocar todas as senhas padrão.</li>
+            <li>Backup seguindo a regra 3-2-1: três cópias, duas mídias, uma fora da empresa.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="netmap" role="img" aria-label="Diagrama: internet, firewall e quatro VLANs: usuários, servidores, convidados e dispositivos IoT">
+        <div class="node inet">Internet</div>
+        <div class="link"></div>
+        <div class="node fw">Firewall / UTM<small>regras entre VLANs · filtro DNS · IPS · VPN</small></div>
+        <div class="link"></div>
+        <div class="vlans">
+          <div class="vlan"><b>Usuários</b><span class="id">VLAN 10 · 192.168.10.0/24</span><p>Acessa servidores só nas portas necessárias e a internet filtrada.</p></div>
+          <div class="vlan"><b>Servidores</b><span class="id">VLAN 20 · 192.168.20.0/24</span><p>Sem acesso direto à internet, exceto atualizações. Backup isolado.</p></div>
+          <div class="vlan guest"><b>Convidados</b><span class="id">VLAN 30 · 192.168.30.0/24</span><p>Somente internet. Nenhuma rota para as demais VLANs.</p></div>
+          <div class="vlan"><b>IoT e câmeras</b><span class="id">VLAN 40 · 192.168.40.0/24</span><p>Impressoras, câmeras e relógio de ponto, sem acesso a servidores.</p></div>
+        </div>
+      </div>
+
+      <div class="sol">
+        <span class="eyebrow">Para PME</span>
+        <p>Um firewall pfSense ou OPNsense em hardware dedicado, ou um UTM comercial de entrada, resolve segmentação, VPN e filtro de DNS em um só equipamento. Combine com switches gerenciáveis e um Wazuh ou Zabbix para alertas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIFI -->
+  <section class="area alt" id="wifi">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Camada sem fio</p>
+        <h2>Wi-Fi</h2>
+        <p class="lead">O Wi-Fi atravessa paredes e chega à calçada. Uma senha compartilhada por anos com funcionários, visitantes e ex-colaboradores equivale a uma porta sem chave.</p>
+      </div>
+      <div class="cols">
+        <div class="panel risk">
+          <h3>Erros comuns em PMEs</h3>
+          <ul>
+            <li>Uma única rede e uma única senha para todos, inclusive visitantes.</li>
+            <li>Senha nunca trocada, mesmo após saída de funcionários.</li>
+            <li>WPS ligado, criptografia WEP ou WPA com TKIP.</li>
+            <li>Painel do roteador ou do AP com usuário e senha de fábrica.</li>
+            <li>Repetidores domésticos instalados por conta própria, fora do controle de TI.</li>
+          </ul>
+        </div>
+        <div class="panel do">
+          <h3>O que implantar</h3>
+          <ul>
+            <li>WPA3 sempre que os dispositivos aceitarem; WPA2 com AES como mínimo.</li>
+            <li>WPA2/WPA3-Enterprise com 802.1X e RADIUS, para que cada pessoa entre com o próprio login.</li>
+            <li>SSID de convidados em VLAN própria, com isolamento de clientes e limite de banda.</li>
+            <li>Desativar WPS e administrar os APs por uma rede de gerência.</li>
+            <li>Controladora ou gestão em nuvem para atualizar firmware e detectar APs não autorizados.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead><tr><th>Rede (SSID)</th><th>Quem usa</th><th>Segurança</th><th>Acesso</th></tr></thead>
+          <tbody>
+            <tr><td>Empresa</td><td>Funcionários</td><td>WPA2/WPA3-Enterprise (802.1X). Em escritórios muito pequenos, WPA3-Personal com senha forte.</td><td>VLAN de usuários</td></tr>
+            <tr><td>Convidados</td><td>Visitantes e clientes</td><td>WPA2/WPA3 com senha simples, isolamento de clientes e portal opcional</td><td>Somente internet</td></tr>
+            <tr><td>Dispositivos</td><td>Impressoras, câmeras, leitores</td><td>WPA2 com senha própria, longa e trocada em intervalos regulares</td><td>VLAN IoT, sem rota para servidores</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sol">
+        <span class="eyebrow">Para PME</span>
+        <p>Pontos de acesso com gestão central e suporte a VLAN por SSID, como Ubiquiti UniFi, TP-Link Omada, Aruba Instant On ou Meraki, dão segurança de nível corporativo a um custo moderado. Para 802.1X, um servidor FreeRADIUS ou o RADIUS integrado ao seu AD cumpre o papel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACESSO REMOTO -->
+  <section class="area" id="acesso-remoto">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Camada fora do escritório</p>
+        <h2>Dados acessados remotamente</h2>
+        <p class="lead">Home office, notebooks e celulares ampliam o perímetro da empresa. Os dados passam a viver em equipamentos que você não controla fisicamente e em redes domésticas ou públicas.</p>
+      </div>
+      <div class="cols">
+        <div class="panel risk">
+          <h3>Erros comuns em PMEs</h3>
+          <ul>
+            <li>Área de trabalho remota (RDP) acessível direto da internet, só com senha.</li>
+            <li>Arquivos da empresa enviados para e-mail e nuvem pessoais.</li>
+            <li>Notebooks sem criptografia de disco, sem bloqueio e sem localização remota.</li>
+            <li>Acesso de ex-funcionários mantido por semanas após o desligamento.</li>
+            <li>Senhas anotadas, reutilizadas ou guardadas no navegador sem proteção.</li>
+            <li>Uso de Wi-Fi público sem VPN.</li>
+          </ul>
+        </div>
+        <div class="panel do">
+          <h3>O que implantar</h3>
+          <ul>
+            <li>VPN (WireGuard, OpenVPN ou IPsec) ou acesso Zero Trust, nunca RDP exposto.</li>
+            <li>MFA em e-mail, VPN, sistemas e contas administrativas, de preferência com aplicativo ou chave física.</li>
+            <li>Criptografia de disco: BitLocker no Windows, FileVault no macOS, LUKS no Linux.</li>
+            <li>Permissões por função, com acesso só ao que cada pessoa precisa para trabalhar.</li>
+            <li>Gestão de dispositivos (MDM) para bloqueio, apagamento remoto e atualização.</li>
+            <li>Roteiro de desligamento: revogar contas, tokens e aparelhos no mesmo dia.</li>
+            <li>Gerenciador de senhas corporativo e política escrita de uso de dispositivos pessoais.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="step"><b>Dispositivo</b><span>Criptografado, atualizado e gerenciado</span></div>
+        <div class="step"><b>Identidade</b><span>Login único com MFA</span></div>
+        <div class="step"><b>Túnel</b><span>VPN ou Zero Trust, sem portas expostas</span></div>
+        <div class="step"><b>Recurso</b><span>Só os sistemas e pastas do cargo</span></div>
+      </div>
+
+      <div class="sol">
+        <span class="eyebrow">Para PME</span>
+        <p>Comece por MFA em todas as contas de e-mail e por uma VPN WireGuard ou Tailscale no lugar do RDP exposto. Depois adicione criptografia de disco, gerenciamento de dispositivos pelo Microsoft Intune ou equivalente e um gerenciador de senhas como Bitwarden.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUÇÕES -->
+  <section class="area alt" id="solucoes">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Ferramentas</p>
+        <h2>Soluções para cada necessidade</h2>
+        <p class="lead">Exemplos de ferramentas conhecidas, de código aberto e comerciais. A escolha depende de equipe, orçamento e do que a empresa já usa. Confira planos e preços atuais antes de contratar.</p>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead><tr><th>Necessidade</th><th>Código aberto ou baixo custo</th><th>Comerciais</th></tr></thead>
+          <tbody>
+            <tr><td>Firewall e UTM</td><td>pfSense CE, OPNsense</td><td>Fortinet FortiGate, Sophos, WatchGuard</td></tr>
+            <tr><td>Antivírus e EDR</td><td>Microsoft Defender (incluído no Windows), ClamAV</td><td>Microsoft Defender for Business, ESET, SentinelOne</td></tr>
+            <tr><td>MFA</td><td>Microsoft Authenticator, Google Authenticator</td><td>Duo, chaves YubiKey</td></tr>
+            <tr><td>Gerenciador de senhas</td><td>Bitwarden, KeePassXC</td><td>1Password, Dashlane</td></tr>
+            <tr><td>Backup</td><td>restic, BorgBackup, Bacula</td><td>Veeam, Acronis, Backblaze</td></tr>
+            <tr><td>VPN e acesso remoto</td><td>WireGuard, OpenVPN, Tailscale</td><td>Cloudflare Zero Trust, FortiClient</td></tr>
+            <tr><td>Logs e monitoramento</td><td>Wazuh, Graylog, Zabbix</td><td>Microsoft Sentinel</td></tr>
+            <tr><td>Gestão de dispositivos</td><td>Gestão nativa do Google Workspace</td><td>Microsoft Intune, Jamf (Mac)</td></tr>
+            <tr><td>Treinamento contra phishing</td><td>GoPhish (simulações)</td><td>KnowBe4</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="area-head" style="margin-top:64px">
+        <p class="eyebrow">Roteiro de implantação</p>
+        <h2>Primeiros 90 dias</h2>
+        <p class="lead">A ordem importa: primeiro fechar as portas mais perigosas, depois organizar a estrutura e por fim criar rotina de manutenção.</p>
+      </div>
+      <div class="phases">
+        <div class="phase">
+          <p class="eyebrow">Dias 1 a 30 · Estancar</p>
+          <h3>Fechar as brechas mais graves</h3>
+          <ul>
+            <li>Inventário de computadores, servidores, contas e acessos.</li>
+            <li>MFA no e-mail e em todas as contas administrativas.</li>
+            <li>Backup 3-2-1 funcionando e uma restauração testada.</li>
+            <li>Trocar senhas padrão de roteadores, APs e câmeras.</li>
+            <li>Fechar RDP e outras portas expostas na internet.</li>
+            <li>Instalar as atualizações pendentes de sistemas.</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <p class="eyebrow">Dias 31 a 60 · Organizar</p>
+          <h3>Separar e padronizar</h3>
+          <ul>
+            <li>VLANs e rede Wi-Fi de convidados separada.</li>
+            <li>Limpeza do AD: contas inativas, grupos privilegiados e LAPS.</li>
+            <li>Endurecimento dos servidores Linux e SSH por chave.</li>
+            <li>EDR em todas as estações e servidores.</li>
+            <li>Gerenciador de senhas para toda a equipe.</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <p class="eyebrow">Dias 61 a 90 · Sustentar</p>
+          <h3>Criar rotina e fôlego</h3>
+          <ul>
+            <li>VPN ou Zero Trust para todo acesso externo.</li>
+            <li>Criptografia de disco nos notebooks.</li>
+            <li>Logs centralizados e alertas para eventos críticos.</li>
+            <li>Política de uso aceitável e treinamento sobre phishing.</li>
+            <li>Plano de resposta a incidentes por escrito e roteiro de desligamento de funcionários.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTOAVALIAÇÃO -->
+  <section class="area" id="autoavaliacao">
+    <div class="wrap">
+      <div class="area-head">
+        <p class="eyebrow">Diagnóstico rápido</p>
+        <h2>Autoavaliação</h2>
+        <p class="lead">Marque o que sua empresa já faz. Os itens iniciais vêm marcados como exemplo; ajuste para a sua realidade. O resultado é uma orientação, não uma auditoria.</p>
+      </div>
+      <div class="check-grid">
+        <div class="groups" id="groups">
+          <div class="group" data-area="Active Directory">
+            <h3>Active Directory</h3>
+            <label><input type="checkbox" checked> Poucos administradores de domínio, cada um com conta administrativa separada</label>
+            <label><input type="checkbox"> Contas de ex-funcionários são desativadas no mesmo dia</label>
+            <label><input type="checkbox"> Cada computador tem senha de administrador local única (LAPS)</label>
+          </div>
+          <div class="group" data-area="Linux">
+            <h3>Linux</h3>
+            <label><input type="checkbox"> SSH só por chave, sem login de root</label>
+            <label><input type="checkbox"> Atualizações de segurança automáticas ativas</label>
+          </div>
+          <div class="group" data-area="Rede">
+            <h3>Rede</h3>
+            <label><input type="checkbox" checked> Firewall gerenciado com senha de fábrica trocada</label>
+            <label><input type="checkbox"> Rede separada em VLANs por função</label>
+            <label><input type="checkbox" checked> Backup 3-2-1 com restauração testada</label>
+          </div>
+          <div class="group" data-area="Wi-Fi">
+            <h3>Wi-Fi</h3>
+            <label><input type="checkbox"> Visitantes usam uma rede isolada da rede interna</label>
+            <label><input type="checkbox"> Acesso dos funcionários com login individual ou senha trocada após desligamentos</label>
+          </div>
+          <div class="group" data-area="Acesso remoto">
+            <h3>Acesso remoto</h3>
+            <label><input type="checkbox"> Nenhum RDP exposto na internet; acesso por VPN ou Zero Trust</label>
+            <label><input type="checkbox"> MFA ativo em e-mail e sistemas críticos</label>
+            <label><input type="checkbox"> Notebooks com criptografia de disco e bloqueio remoto</label>
+          </div>
+        </div>
+
+        <aside class="score" aria-live="polite">
+          <p class="eyebrow">Seu resultado</p>
+          <div class="big"><span id="sc">0</span><small> / <span id="tot">0</span></small></div>
+          <div class="bar" aria-hidden="true"><i id="fill"></i></div>
+          <span class="chip level" id="level">Exposta</span>
+          <div class="bd" id="bd"></div>
+          <p class="hint" id="hint"></p>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Desenvolvido por <strong>Murilo Rozado</strong>, analista e desenvolvedor de sistemas com ênfase em segurança da informação.</p>
+    <p>Conteúdo informativo, atualizado em outubro de 2026. Adapte as recomendações ao porte e aos sistemas da sua empresa.</p>
+    <p>Para um diagnóstico completo e testes de segurança, contrate um profissional ou empresa especializada.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('#groups input[type="checkbox"]'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('#groups .group'));
+  var sc = document.getElementById('sc'), tot = document.getElementById('tot');
+  var fill = document.getElementById('fill'), level = document.getElementById('level');
+  var bd = document.getElementById('bd'), hint = document.getElementById('hint');
+  var order = ['Acesso remoto', 'Active Directory', 'Rede', 'Wi-Fi', 'Linux'];
+  var anchors = { 'Acesso remoto': '#acesso-remoto', 'Active Directory': '#active-directory', 'Rede': '#rede', 'Wi-Fi': '#wifi', 'Linux': '#linux' };
+
+  function update() {
+    var total = boxes.length;
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    sc.textContent = done;
+    tot.textContent = total;
+    fill.style.width = Math.round((done / total) * 100) + '%';
+
+    var ratio = done / total, cls = 'crit', label = 'Exposta';
+    if (ratio >= 0.75) { cls = 'ok'; label = 'Consistente'; }
+    else if (ratio >= 0.4) { cls = 'warn'; label = 'Em construção'; }
+    level.className = 'chip level ' + cls;
+    level.textContent = label;
+
+    var rows = '', worst = null, worstGap = -1;
+    groups.forEach(function (g) {
+      var inputs = g.querySelectorAll('input');
+      var n = inputs.length, c = 0;
+      Array.prototype.forEach.call(inputs, function (i) { if (i.checked) c++; });
+      var gap = (n - c) / n;
+      var name = g.getAttribute('data-area');
+      if (gap > worstGap || (gap === worstGap && order.indexOf(name) < order.indexOf(worst))) { worstGap = gap; worst = name; }
+      rows += '<div><span>' + name + '</span><span>' + c + '/' + n + '</span></div>';
+    });
+    bd.innerHTML = rows;
+
+    if (worstGap > 0 && worst) {
+      hint.innerHTML = 'Maior lacuna: <a href="' + anchors[worst] + '">' + worst + '</a>.';
+    } else {
+      hint.textContent = 'Todos os itens marcados. Mantenha a rotina de revisão a cada trimestre.';
+    }
+  }
+
+  boxes.forEach(function (b) { b.addEventListener('change', update); });
+  update();
+})();
+</script>
+<script>
+(function () {
+  var cv = document.getElementById('stars');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stars = [], W = 0, H = 0, dpr = 1;
+  var tints = ['190,215,255', '255,255,255', '120,175,255', '150,200,255'];
+
+  function gauss() { return (Math.random() + Math.random() + Math.random() + Math.random() - 2) / 2; }
+
+  function build() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(Math.min(380, Math.max(160, (W * H) / 4200)));
+    stars = [];
+    for (var i = 0; i < n; i++) {
+      var x, y;
+      if (i < n * 0.58) {
+        var tt = Math.random();
+        var off = gauss() * H * 0.2;
+        x = tt * W + off * 0.5;
+        y = H * (0.92 - tt * 0.84) + off;
+      } else {
+        x = Math.random() * W; y = Math.random() * H;
+      }
+      var big = Math.random() < 0.07;
+      stars.push({
+        x: x, y: y,
+        r: big ? 1.4 + Math.random() * 0.8 : 0.3 + Math.random() * 0.9,
+        a: 0.35 + Math.random() * 0.65,
+        s: 0.4 + Math.random() * 1.6,
+        p: Math.random() * 6.28,
+        c: tints[(Math.random() * tints.length) | 0]
+      });
+    }
+  }
+
+  function draw(ms) {
+    var t = ms / 1000;
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var k = reduce ? 1 : 0.6 + 0.4 * Math.sin(t * s.s + s.p);
+      var al = s.a * k;
+      ctx.fillStyle = 'rgba(' + s.c + ',' + al.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+      if (s.r > 1.4) {
+        ctx.fillStyle = 'rgba(' + s.c + ',' + (al * 0.18).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3.2, 0, 6.2832); ctx.fill();
+      }
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { build(); if (reduce) draw(0); }, 150);
+  });
+  build();
+  requestAnimationFrame(draw);
+})();
+</script>
+
+
+</body>
+</html>
